@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Búsqueda de la ruta óptima</title>
+</head>
+<body>
+    <h1>Proyecto 1 - Búsqueda de la ruta óptima</h1>
+    <form method="post">
+        <label>Algoritmo:</label>
+        <select name="algorithm">
+            {% for algo in algorithms %}
+            <option value="{{ algo }}">{{ algo }}</option>
+            {% endfor %}
+        </select>
+        <label>Inicio:</label>
+        <select name="start">
+            {% for node in nodes %}
+            <option value="{{ node }}">{{ node }}</option>
+            {% endfor %}
+        </select>
+        <label>Meta:</label>
+        <select name="goal">
+            {% for node in nodes %}
+            <option value="{{ node }}">{{ node }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Ejecutar</button>
+    </form>
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+    {% if path %}
+        <h2>Camino encontrado:</h2>
+        <p>{{ path }}</p>
+    {% endif %}
+    <div>
+        {{ map_html|safe }}
+    </div>
+</body>
+</html>

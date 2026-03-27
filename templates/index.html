@@ -31,7 +31,10 @@
     {% endif %}
     {% if path %}
         <h2>Camino encontrado:</h2>
-        <p>{{ path }}</p>
+        <p>{{ path | join(" → ") }}</p>
+        {% if cost is not none %}
+            <p><strong>Costo total:</strong> {{ cost }} km</p>
+        {% endif %}
     {% endif %}
     <div>
         {{ map_html|safe }}

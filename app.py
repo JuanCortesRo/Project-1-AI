@@ -23,7 +23,6 @@ def index():
         goal = request.form["goal"]
         try:
             algo_module = importlib.import_module(f"algorithms.{ALGORITHMS[algo_key]}")
-            path = algo_module.search(graph, start, goal)
             result = algo_module.search(graph, start, goal)
             if isinstance(result, tuple):
                 path, cost = result

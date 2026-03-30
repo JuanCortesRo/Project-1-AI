@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Búsqueda de la ruta óptima</title>
+    <title>Ruta óptima</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -9,7 +9,6 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- TU CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
@@ -17,15 +16,12 @@
 
 <div class="container mt-5">
 
-    <!-- HEADER -->
     <div class="card shadow p-4">
         <h1>
             <i class="bi bi-signpost-split title-icon"></i>
             Ruta óptima entre ciudades
         </h1>
-
-        <!-- ALGORITMO -->
-        <div class="text-center mt-4">
+        <!-- <div class="text-center mt-4">
             <div class="algo-label">Algoritmo seleccionado</div>
 
             <div id="selectedAlgoBadge" class="algo-badge text-white mt-2">
@@ -34,12 +30,9 @@
             </div>
         </div>
 
-        <p id="algoDescription" class="text-muted text-center mt-2"></p>
+        <p id="algoDescription" class="text-muted text-center mt-2"></p> -->
 
         <form method="post" class="row g-3">
-
-
-            <!-- ALGORITMOS -->
             <div class="col-12">
                 <label class="form-label"><i class="bi bi-cpu"></i> Algoritmo</label>
                 <div class="algo-container">
@@ -55,7 +48,6 @@
                 </div>
             </div>
 
-            <!-- SELECTS CON SWAP -->
             <div class="col-12">
                 <div class="row g-2 align-items-end">
                     <div class="col">
@@ -88,14 +80,27 @@
                 </div>
             </div>
 
-            <!-- BOTÓN -->
-            <div class="col-12 text-center">
+            <div id="mainBtnGroup" class="text-center">
                 <button id="submitBtn" type="submit" class="btn btn-success px-5 fw-bold">
                     <i class="bi bi-rocket-takeoff"></i>
                     <span id="btnText">Ejecutar búsqueda</span>
                 </button>
+                <button type="button" id="toggleGraphBtn" class="btn btn-outline-secondary ms-2">
+                    <i class="bi bi-diagram-3"></i> Ver grafo
+                </button>
             </div>
 
+            <div id="graphEditBtnGroup" class="text-center" style="display:none;">
+                <button type="button" id="saveGraphBtn" class="btn btn-primary mb-2">
+                    <i class="bi bi-save"></i> Guardar grafo
+                </button>
+                <button type="button" id="resetGraphBtn" class="btn btn-outline-danger mb-2 ms-2">
+                    <i class="bi bi-arrow-counterclockwise"></i> Resetear grafo
+                </button>
+            </div>
+            <div id="graphInputContainer" style="display:none;">
+                <textarea id="graphInput" name="graphInput" class="form-control" rows="10" style="font-family:monospace; font-size:13px;">{{ graph_json }}</textarea>
+            </div>
         </form>
     </div>
 
@@ -163,6 +168,40 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<script>
+    const toggleBtn = document.getElementById('toggleGraphBtn');
+    const saveBtn = document.getElementById('saveGraphBtn');
+    const resetBtn = document.getElementById('resetGraphBtn');
+    const mainBtnGroup = document.getElementById('mainBtnGroup');
+    const graphEditBtnGroup = document.getElementById('graphEditBtnGroup');
+    const graphContainer = document.getElementById('graphInputContainer');
+    const graphTextarea = document.getElementById('graphInput');
+    const originalGraph = `{{ original_graph_json|safe }}`;
+
+    // Graph editor
+    if (toggleBtn && graphContainer && mainBtnGroup && graphEditBtnGroup) {
+        toggleBtn.addEventListener('click', function() {
+            mainBtnGroup.style.display = 'none';
+            graphEditBtnGroup.style.display = 'block';
+            graphContainer.style.display = 'block';
+        });
+    }
+    // Save Graph
+    if (saveBtn && graphContainer && mainBtnGroup && graphEditBtnGroup) {
+        saveBtn.addEventListener('click', function() {
+            graphContainer.style.display = 'none';
+            graphEditBtnGroup.style.display = 'none';
+            mainBtnGroup.style.display = 'block';
+        });
+    }
+    // Reset Graph
+    if (resetBtn && graphTextarea) {
+        resetBtn.addEventListener('click', function() {
+            graphTextarea.value = originalGraph;
+        });
+    }
+</script>
 
 </body>
 </html>

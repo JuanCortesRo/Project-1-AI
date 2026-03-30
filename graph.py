@@ -63,10 +63,12 @@ def punto_medio(lat1, lon1, lat2, lon2):
     lon3 = lon1 + math.atan2(By, math.cos(lat1) + Bx)
     return math.degrees(lat3), math.degrees(lon3)
 
-def get_map_html(path=None, algorithm="BFS"):
+def get_map_html(path=None, algorithm="BFS", graph=None):
+    if graph is None:
+        from graph import graph as default_graph
+        graph = default_graph
     mapa = folium.Map(location=[3.45, -76.53], zoom_start=10)
 
-    # 🎨 colores por algoritmo
     colors = {
         "BFS": "#1f77ff",
         "DFS": "#8e44ad",
@@ -86,7 +88,6 @@ def get_map_html(path=None, algorithm="BFS"):
             icon=folium.Icon(color=color)
         ).add_to(mapa)
 
-    # aristas + etiquetas limpias 🔥
     dibujadas = set()
     for ciudad, vecinos in graph.items():
         for vecino, distancia in vecinos.items():
@@ -123,14 +124,13 @@ def get_map_html(path=None, algorithm="BFS"):
                             {distancia} km
                         </div>
                         """,
-                        icon_size=(60, 25),      # 🔥 IMPORTANTE (antes estaba mal)
-                        icon_anchor=(30, 12),    # 🔥 centra el label
+                        icon_size=(60, 25),     
+                        icon_anchor=(30, 12),
                     )
                 ).add_to(mapa)
 
                 dibujadas.add((ciudad, vecino))
-
-    # ruta con color del algoritmo 🔥
+                
     if path and len(path) > 1:
         for i in range(len(path) - 1):
             lat1, lon1 = coords[path[i]]

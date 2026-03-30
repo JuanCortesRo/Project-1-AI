@@ -1,7 +1,7 @@
 import folium
 import math
 
-# GRAFO (para algoritmos)
+# GRAFO
 graph = {
     'Cali': {'Palmira': 28.5, 'Rozo': 27, 'Dagua' : 48, 'Yumbo' : 18.3, 'Jamundí' : 23.4, 'Candelaria' : 26.3, 'Puerto Tejada' : 35.8},
     'Palmira': {'Cali': 28.5, 'El Cerrito':20.5, 'Rozo' : 16.6, 'Candelaria' : 16},
@@ -26,8 +26,7 @@ graph = {
     'Florida' : {'Corinto' : 19, 'Candelaria' : 18, 'Puerto Tejada' : 27.8}
 }
 
-
-# COORDENADAS (para mapa y heurística)
+# COORDENADAS
 coords = {
     'Cali': (3.4479129327977103, -76.53241229310366),
     'Palmira': (3.5375794648769365, -76.3162299504712),
@@ -52,7 +51,6 @@ coords = {
     'Florida' : (3.323456370369777, -76.23782689315841),
 }
 
-# Funciones para visualizar el mapa
 def punto_medio(lat1, lon1, lat2, lon2):
     lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
     dlon = lon2 - lon1
@@ -63,13 +61,22 @@ def punto_medio(lat1, lon1, lat2, lon2):
         math.sqrt((math.cos(lat1) + Bx)**2 + By**2)
     )
     lon3 = lon1 + math.atan2(By, math.cos(lat1) + Bx)
-
     return math.degrees(lat3), math.degrees(lon3)
 
-def get_map_html(path=None):
+def get_map_html(path=None, algorithm="BFS"):
     mapa = folium.Map(location=[3.45, -76.53], zoom_start=10)
 
-    #nodos
+    # 🎨 colores por algoritmo
+    colors = {
+        "BFS": "#1f77ff",
+        "DFS": "#8e44ad",
+        "UCS": "#27ae60",
+        "A*": "#f39c12"
+    }
+
+    route_color = colors.get(algorithm, "#ff0000")
+
+    # nodos
     path_set = set(path) if path else set()
     for ciudad, (lat, lon) in coords.items():
         color = "red" if ciudad in path_set else "blue"
@@ -79,58 +86,61 @@ def get_map_html(path=None):
             icon=folium.Icon(color=color)
         ).add_to(mapa)
 
-    #aristas y etiquetas de distancia
+    # aristas + etiquetas limpias 🔥
     dibujadas = set()
     for ciudad, vecinos in graph.items():
         for vecino, distancia in vecinos.items():
             if (vecino, ciudad) not in dibujadas:
                 lat1, lon1 = coords[ciudad]
                 lat2, lon2 = coords[vecino]
-                folium.PolyLine(locations=[[lat1, lon1], [lat2, lon2]], color="blue").add_to(mapa)
+
+                folium.PolyLine(
+                    locations=[[lat1, lon1], [lat2, lon2]],
+                    color="blue",
+                    weight=3,
+                    opacity=0.6
+                ).add_to(mapa)
 
                 mid_lat, mid_lon = punto_medio(lat1, lon1, lat2, lon2)
+
                 folium.Marker(
                     location=[mid_lat, mid_lon],
                     icon=folium.DivIcon(
                         html=f"""
                         <div style="
-                            transform: translate(-50%, -50%);
-                            background-color: white;
-                            border-radius: 50%;
-                            height: 35px;
-                            width: 35px;
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                            justify-content: center;
-                            border: 2px solid blue;
+                            display: inline-block;
+                            background-color: rgba(255,255,255,0.95);
+                            padding: 4px 8px;
+                            border-radius: 12px;
+                            font-size: 11px;
+                            font-weight: 600;
+                            color: #333;
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+                            border: 1px solid rgba(0,0,0,0.2);
+                            white-space: nowrap;
+                            text-align: center;
                         ">
-                            <div style="
-                                font-size: 12px;
-                                font-weight: bold;
-                                line-height: 1;
-                            ">
-                                {distancia}
-                            </div>
-                            <div style="
-                                font-size: 9px;
-                                line-height: 1;
-                                margin-top: -2px;
-                            ">
-                                km
-                            </div>
+                            {distancia} km
                         </div>
-                        """
+                        """,
+                        icon_size=(60, 25),      # 🔥 IMPORTANTE (antes estaba mal)
+                        icon_anchor=(30, 12),    # 🔥 centra el label
                     )
                 ).add_to(mapa)
 
                 dibujadas.add((ciudad, vecino))
 
-    #di hay camino, dibujarlo en rojo
+    # ruta con color del algoritmo 🔥
     if path and len(path) > 1:
         for i in range(len(path) - 1):
             lat1, lon1 = coords[path[i]]
             lat2, lon2 = coords[path[i+1]]
-            folium.PolyLine(locations=[[lat1, lon1], [lat2, lon2]], color="red", weight=6).add_to(mapa)
+
+            folium.PolyLine(
+                locations=[[lat1, lon1], [lat2, lon2]],
+                color=route_color,
+                weight=6,
+                opacity=1
+            ).add_to(mapa)
 
     return mapa._repr_html_()

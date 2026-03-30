@@ -7,32 +7,43 @@ app = Flask(__name__)
 ALGORITHMS = {
     "BFS": "bfs",
     "DFS": "dfs",
-    "UCS" : "ucs",
-    "A*" : "astar",
+    "UCS": "ucs",
+    "A*": "astar",
 }
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    result = None
     path = []
     cost = None
     error = None
+
+    selected_algorithm = "BFS"
+    selected_start = "Cali"
+    selected_goal = "Buga"
+
     if request.method == "POST":
-        algo_key = request.form["algorithm"]
-        start = request.form["start"]
-        goal = request.form["goal"]
+        selected_algorithm = request.form["algorithm"]
+        selected_start = request.form["start"]
+        selected_goal = request.form["goal"]
+
         try:
-            algo_module = importlib.import_module(f"algorithms.{ALGORITHMS[algo_key]}")
-            result = algo_module.search(graph, start, goal)
+            algo_module = importlib.import_module(
+                f"algorithms.{ALGORITHMS[selected_algorithm]}"
+            )
+
+            result = algo_module.search(graph, selected_start, selected_goal)
+
             if isinstance(result, tuple):
                 path, cost = result
             else:
                 path = result
-                cost = None
+
             if path is None:
-                error = "Algoritmo no implementado o no se encontró camino."
+                error = "No se encontró camino entre los nodos seleccionados."
+
         except Exception as e:
             error = str(e)
+
     return render_template(
         "index.html",
         algorithms=ALGORITHMS.keys(),
@@ -41,7 +52,10 @@ def index():
         cost=cost,
         error=error,
         coords=coords,
-        map_html=get_map_html(path)
+        map_html=get_map_html(path, selected_algorithm),  # 🔥 clave
+        selected_algorithm=selected_algorithm,
+        selected_start=selected_start,
+        selected_goal=selected_goal
     )
 
 if __name__ == "__main__":

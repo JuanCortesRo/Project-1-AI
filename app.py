@@ -52,7 +52,7 @@ def index():
         cost=cost,
         error=error,
         coords=coords,
-        map_html=get_map_html(path, selected_algorithm),  # 🔥 clave
+        map_html=get_map_html(path, selected_algorithm),
         selected_algorithm=selected_algorithm,
         selected_start=selected_start,
         selected_goal=selected_goal

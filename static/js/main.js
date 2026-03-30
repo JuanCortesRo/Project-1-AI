@@ -29,14 +29,17 @@ const algorithmsData = {
 
 function updateUI(value) {
     const data = algorithmsData[value];
+    if (!data) return;
 
-    text.textContent = value;
-    icon.className = "bi " + data.icon + " me-2";
-    desc.textContent = data.desc;
-    badge.classList.remove("algo-bfs", "algo-dfs", "algo-ucs", "algo-astar");
-    badge.classList.add(data.class);
-    badge.style.transform = "scale(1.08)";
-    setTimeout(() => badge.style.transform = "scale(1)", 180);
+    if (text) text.textContent = value;
+    if (icon) icon.className = "bi " + data.icon + " me-2";
+    if (desc) desc.textContent = data.desc;
+    if (badge) {
+        badge.classList.remove("algo-bfs", "algo-dfs", "algo-ucs", "algo-astar");
+        badge.classList.add(data.class);
+        badge.style.transform = "scale(1.08)";
+        setTimeout(() => badge.style.transform = "scale(1)", 180);
+    }
 }
 
 
@@ -61,7 +64,6 @@ if (swapBtn && startSelect && goalSelect) {
         const temp = startSelect.value;
         startSelect.value = goalSelect.value;
         goalSelect.value = temp;
-        // Opcional: resaltar selects brevemente
         startSelect.classList.add('swap-highlight');
         goalSelect.classList.add('swap-highlight');
         setTimeout(() => {

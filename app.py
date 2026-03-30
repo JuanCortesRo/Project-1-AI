@@ -11,6 +11,10 @@ ALGORITHMS = {
     "A*": "astar",
 }
 
+@app.route("/health")
+def health():
+    return "OK", 200
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     path = []
@@ -23,11 +27,9 @@ def index():
 
 
     import json
-    # Generar el JSON original del archivo graph.py
     from graph import graph as default_graph
     original_graph_json = json.dumps(default_graph, indent=4, ensure_ascii=False)
     
-    # graph_json será lo que se muestre en el textarea (el estado actual)
     graph_json = json.dumps(graph, indent=4, ensure_ascii=False)
     custom_graph = graph
     if request.method == "POST":

@@ -1,10 +1,13 @@
+.swap-highlight {
+    box-shadow: 0 0 0 3px #1f77ff55;
+    transition: box-shadow 0.2s;
+}
 :root {
     --primary: #2563eb;
     --primary-soft: #e0e7ff;
     --text: #1f2937;
 }
 
-/* GENERAL */
 body {
     background: linear-gradient(135deg, #f8f9fa, #eef2f7);
     font-family: system-ui, -apple-system, sans-serif;
@@ -21,7 +24,6 @@ body {
     box-shadow: 0 12px 30px rgba(0,0,0,0.08);
 }
 
-/* HEADER */
 h1 {
     display: flex;
     justify-content: center;
@@ -33,7 +35,7 @@ h1 {
     color: var(--primary);
 }
 
-/* 🔥 BLOQUE ALGORITMO */
+
 .algo-header {
     display: flex;
     flex-direction: column;
@@ -41,7 +43,6 @@ h1 {
     gap: 6px;
 }
 
-/* LABEL */
 .algo-label {
     font-size: 0.7rem;
     letter-spacing: 1px;
@@ -49,7 +50,6 @@ h1 {
     color: #6b7280;
 }
 
-/* BADGE PRO */
 .algo-badge {
     display: inline-flex;
     align-items: center;
@@ -69,13 +69,11 @@ h1 {
     transform: scale(1.05);
 }
 
-/* 🎯 COLORES */
 .algo-bfs { background: #1f77ff; }
 .algo-dfs { background: #8e44ad; }
 .algo-ucs { background: #27ae60; }
 .algo-astar { background: #f39c12; }
 
-/* BOTONES ALGORITMO */
 .algo-container {
     display: flex;
     gap: 10px;
@@ -93,26 +91,24 @@ h1 {
     font-weight: 500;
 }
 
-/* HOVER */
 .algo-btn:hover {
     transform: translateY(-2px);
     background: var(--primary-soft);
     border-color: var(--primary);
 }
 
-/* ACTIVO */
 .btn-check:checked + .algo-btn {
     background: var(--primary);
     color: white;
     box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
 }
 
-/* RESULTADO */
+
 .result-card {
     border-left: 6px solid var(--primary);
 }
 
-/* ===== RUTA ===== */
+
 .route-horizontal {
     display: flex;
     align-items: center;
@@ -128,7 +124,6 @@ h1 {
     min-width: 90px;
 }
 
-/* CÍRCULO */
 .circle {
     width: 44px;
     height: 44px;
@@ -148,14 +143,12 @@ h1 {
     transition: 0.25s;
 }
 
-/* HOVER */
 .route-step:hover .circle {
     transform: scale(1.1);
     background: var(--primary);
     color: white;
 }
 
-/* TEXTO */
 .city {
     margin-top: 6px;
     font-size: 0.9rem;
@@ -163,7 +156,6 @@ h1 {
     text-align: center;
 }
 
-/* LÍNEA */
 .line {
     height: 4px;
     width: 70px;
@@ -171,19 +163,16 @@ h1 {
     border-radius: 10px;
 }
 
-/* INICIO */
 .route-step:first-child .circle {
     border-color: #22c55e;
     color: #22c55e;
 }
 
-/* FINAL */
 .route-step:last-child .circle {
     border-color: #ef4444;
     color: #ef4444;
 }
 
-/* ===== COSTO ===== */
 .cost-card {
     display: flex;
     align-items: center;
@@ -203,12 +192,10 @@ h1 {
     transform: scale(1.03);
 }
 
-/* ICONO */
 .cost-card i {
     font-size: 2.4rem;
 }
 
-/* TEXTO */
 .cost-label {
     font-size: 0.75rem;
     opacity: 0.85;

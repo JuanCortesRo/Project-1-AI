@@ -4,7 +4,6 @@ const desc = document.getElementById("algoDescription");
 const icon = document.getElementById("algoIcon");
 const text = document.getElementById("algoText");
 
-/* 🔥 COLORES IGUALES AL BACKEND */
 const algorithmsData = {
     "BFS": {
         desc: "Explora nivel por nivel.",
@@ -34,17 +33,12 @@ function updateUI(value) {
     text.textContent = value;
     icon.className = "bi " + data.icon + " me-2";
     desc.textContent = data.desc;
-
-    // quitar clases
     badge.classList.remove("algo-bfs", "algo-dfs", "algo-ucs", "algo-astar");
-
-    // aplicar color
     badge.classList.add(data.class);
-
-    // 🔥 animación pro
     badge.style.transform = "scale(1.08)";
     setTimeout(() => badge.style.transform = "scale(1)", 180);
 }
+
 
 /* inicial */
 const selected = document.querySelector('.algo-option:checked');
@@ -56,3 +50,23 @@ algoOptions.forEach(option => {
         updateUI(this.value);
     });
 });
+
+// --- SWAP BUTTON ---
+const swapBtn = document.getElementById('swapBtn');
+const startSelect = document.getElementById('startSelect');
+const goalSelect = document.getElementById('goalSelect');
+
+if (swapBtn && startSelect && goalSelect) {
+    swapBtn.addEventListener('click', function() {
+        const temp = startSelect.value;
+        startSelect.value = goalSelect.value;
+        goalSelect.value = temp;
+        // Opcional: resaltar selects brevemente
+        startSelect.classList.add('swap-highlight');
+        goalSelect.classList.add('swap-highlight');
+        setTimeout(() => {
+            startSelect.classList.remove('swap-highlight');
+            goalSelect.classList.remove('swap-highlight');
+        }, 300);
+    });
+}

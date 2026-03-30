@@ -38,16 +38,15 @@
 
         <form method="post" class="row g-3">
 
+
             <!-- ALGORITMOS -->
             <div class="col-12">
                 <label class="form-label"><i class="bi bi-cpu"></i> Algoritmo</label>
-
                 <div class="algo-container">
                     {% for algo in algorithms %}
                     <input type="radio" class="btn-check algo-option" name="algorithm"
                         value="{{ algo }}" id="algo{{ loop.index }}"
                         {% if algo == selected_algorithm %}checked{% endif %}>
-
                     <label class="algo-btn d-flex gap-2 justify-content-center align-items-center"
                         for="algo{{ loop.index }}">
                         {{ algo }}
@@ -56,27 +55,37 @@
                 </div>
             </div>
 
-            <!-- SELECTS -->
-            <div class="col-md-6">
-                <label class="form-label"><i class="bi bi-geo-alt"></i> Inicio</label>
-                <select name="start" class="form-select">
-                    {% for node in nodes %}
-                    <option value="{{ node }}" {% if node == selected_start %}selected{% endif %}>
-                        {{ node }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
+            <!-- SELECTS CON SWAP -->
+            <div class="col-12">
+                <div class="row g-2 align-items-end">
+                    <div class="col">
+                        <label class="form-label"><i class="bi bi-geo-alt"></i> Inicio</label>
+                        <select id="startSelect" name="start" class="form-select">
+                            {% for node in nodes %}
+                            <option value="{{ node }}" {% if node == selected_start %}selected{% endif %}>
+                                {{ node }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-            <div class="col-md-6">
-                <label class="form-label"><i class="bi bi-flag"></i> Destino</label>
-                <select name="goal" class="form-select">
-                    {% for node in nodes %}
-                    <option value="{{ node }}" {% if node == selected_goal %}selected{% endif %}>
-                        {{ node }}
-                    </option>
-                    {% endfor %}
-                </select>
+                    <div class="col-auto pb-1">
+                        <button type="button" id="swapBtn" class="btn border-0 shadow-none" title="Intercambiar inicio y destino">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="col">
+                        <label class="form-label"><i class="bi bi-flag"></i> Destino</label>
+                        <select id="goalSelect" name="goal" class="form-select">
+                            {% for node in nodes %}
+                            <option value="{{ node }}" {% if node == selected_goal %}selected{% endif %}>
+                                {{ node }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <!-- BOTÓN -->
@@ -99,7 +108,7 @@
             Ruta encontrada
         </h4>
 
-        <!-- 🔥 RUTA HORIZONTAL -->
+        <!-- RUTA HORIZONTAL -->
         <div class="route-horizontal mt-4">
             {% for node in path %}
                 <div class="route-step">

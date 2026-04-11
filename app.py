@@ -55,6 +55,8 @@ def resolve_search_state(req):
     cost = None
     error = None
     show_heuristic = False
+    algo_logs = []
+    algo_stats = None
 
     selected_algorithm = "BFS"
     selected_start = "Cali"
@@ -91,10 +93,17 @@ def resolve_search_state(req):
                 search_graph["heuristic"] = build_heuristic(selected_goal)
 
             result = algo_module.search(search_graph, selected_start, selected_goal)
-            if isinstance(result, tuple):
+
+            if isinstance(result, dict):
+                path = result.get("path")
+                cost = result.get("cost")
+                algo_logs = result.get("logs", [])
+                algo_stats = result.get("stats")
+            elif isinstance(result, tuple):
                 path, cost = result
             else:
                 path = result
+
             if path is None and not error:
                 error = "No se encontró camino entre los nodos seleccionados."
         except Exception as e:
@@ -118,6 +127,8 @@ def resolve_search_state(req):
         "cost": cost,
         "error": error,
         "show_heuristic": show_heuristic,
+        "algo_logs": algo_logs,
+        "algo_stats": algo_stats,
         "selected_algorithm": selected_algorithm,
         "selected_start": selected_start,
         "selected_goal": selected_goal,
@@ -160,6 +171,8 @@ def index():
         path=state["path"],
         cost=state["cost"],
         error=state["error"],
+        algo_logs=state["algo_logs"],
+        algo_stats=state["algo_stats"],
         coords=coords,
         split_map=state["split_map"],
         map_left_html=state["map_left_html"],

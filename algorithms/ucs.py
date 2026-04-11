@@ -17,19 +17,39 @@ def search(graph, start, goal):
         goal (str): Nodo objetivo.
 
     Retorna:
-        tuple[list[str] | None, float | None]: Ruta y costo total acumulado,
-        o (None, None) si no existe camino.
+        dict: Estructura con ruta, costo, estadisticas y logs temporales de ejecucion.
     """
     dist = {start: 0}
     parent = {start: None}
     frontier = [(0, start)]  # (coste acumulado, nodo)
+
+    logs = [
+        "=== Inicio UCS ===",
+        f"Nodo inicial: {start}",
+        f"Nodo objetivo: {goal}",
+    ]
+    iteracion = 0
+    nodos_expandidos = 0
+
     while frontier:
+        iteracion += 1
         # seleccionar el nodo con menor costo acumulado
         frontier.sort(key=lambda x: x[0])  # ordena por costo
         cost, node = frontier.pop(0)       # saca el primero (menor costo)
+
+        logs.append(f"\nIteracion {iteracion} - Extraccion")
+        logs.append(f"Nodo actual: {node}")
+        logs.append(f"Costo acumulado actual: {cost:.2f}")
+        logs.append(f"Frontera actual: {frontier}")
+        logs.append(f"Distancias conocidas: {dist}")
+
         # ignorar entradas viejas
         if cost > dist.get(node, float('inf')):
+            logs.append("Entrada obsoleta descartada por costo mayor al mejor conocido.")
             continue
+
+        nodos_expandidos += 1
+
         # Si llegamos al objetivo
         if node == goal:
             # reconstruir camino
@@ -39,7 +59,24 @@ def search(graph, start, goal):
                 path.append(cur)
                 cur = parent[cur]
             path.reverse()
-            return path, cost
+
+            logs.append("\n=== Fin UCS ===")
+            logs.append(f"Camino encontrado: {' -> '.join(path)}")
+            logs.append(f"Nodos expandidos: {nodos_expandidos}")
+            logs.append(f"Nodos descubiertos: {len(dist)}")
+            logs.append(f"Costo final de la ruta: {cost:.2f} km")
+
+            return {
+                "path": path,
+                "cost": cost,
+                "stats": {
+                    "nodes_expanded": nodos_expandidos,
+                    "nodes_discovered": len(dist),
+                    "final_cost": cost,
+                },
+                "logs": logs,
+            }
+
         # expandir vecinos
         for neighbor, weight in graph.get(node, {}).items(): # se adapto la iteracion de vecinos al grafo de nuestra app
             new_cost = cost + weight
@@ -47,4 +84,23 @@ def search(graph, start, goal):
                 dist[neighbor] = new_cost
                 parent[neighbor] = node
                 frontier.append((new_cost, neighbor))
-    return None, None
+
+        siguiente = frontier[0][1] if frontier else "Ninguno"
+        logs.append(f"Siguiente nodo a visitar: {siguiente}")
+
+    logs.append("\n=== Fin UCS ===")
+    logs.append("Camino no encontrado.")
+    logs.append(f"Nodos expandidos: {nodos_expandidos}")
+    logs.append(f"Nodos descubiertos: {len(dist)}")
+    logs.append("Costo final de la ruta: N/A")
+
+    return {
+        "path": None,
+        "cost": None,
+        "stats": {
+            "nodes_expanded": nodos_expandidos,
+            "nodes_discovered": len(dist),
+            "final_cost": None,
+        },
+        "logs": logs,
+    }

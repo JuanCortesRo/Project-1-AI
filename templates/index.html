@@ -150,6 +150,45 @@
     </div>
     {% endif %}
 
+    {% if algo_stats %}
+    <div class="card shadow mt-4 p-4">
+        <h5 class="mb-3"><i class="bi bi-clipboard-data"></i> Métricas {{ selected_algorithm }}</h5>
+        <div class="row g-2">
+            <div class="col-md-6">
+                <div class="metric-box">
+                    <div class="metric-label">Nodos expandidos</div>
+                    <div class="metric-value">{{ algo_stats.nodes_expanded }}</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="metric-box">
+                    <div class="metric-label">Nodos descubiertos</div>
+                    <div class="metric-value">{{ algo_stats.nodes_discovered }}</div>
+                </div>
+            </div>
+            <!-- <div class="col-md-4">
+                <div class="metric-box">
+                    <div class="metric-label">Costo final</div>
+                    <div class="metric-value">
+                        {% if algo_stats.final_cost is not none %}
+                            {{ algo_stats.final_cost | round(2) }} km
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+            </div> -->
+        </div>
+        {% if algo_logs %}
+        <div class="mt-3 text-end">
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#algoLogsModal">
+                <i class="bi bi-journal-text"></i> Ver Logs
+            </button>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
     <!-- ERROR -->
     {% if error %}
     <div class="alert alert-danger mt-4">
@@ -179,6 +218,28 @@
     </div>
 
 </div>
+
+{% if algo_logs %}
+<div class="modal fade" id="algoLogsModal" tabindex="-1" aria-labelledby="algoLogsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="algoLogsModalLabel">
+                    <i class="bi bi-journal-code"></i> Logs de ejecución {{ selected_algorithm }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <pre class="log-console mb-0">{% for line in algo_logs %}{{ line }}
+{% endfor %}</pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>

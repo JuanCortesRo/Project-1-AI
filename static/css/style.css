@@ -208,6 +208,40 @@ h1 {
     font-weight: 800;
 }
 
+.metric-box {
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 14px;
+    background: #f8fafc;
+    height: 100%;
+}
+
+.metric-label {
+    color: #6b7280;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.metric-value {
+    color: #0f172a;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.log-console {
+    background: #0b1020;
+    color: #dbeafe;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: "Fira Code", "Consolas", monospace;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    max-height: 60vh;
+    overflow: auto;
+}
+
 .map-single-wrap,
 .map-split-wrap {
     border-radius: 14px;

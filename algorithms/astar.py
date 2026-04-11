@@ -17,8 +17,7 @@ def search(graph, start, goal):
         goal (str): Nodo objetivo.
 
     Retorna:
-        tuple[list[str], float] | None: Ruta encontrada y costo acumulado,
-        o None si no existe camino.
+        dict: Estructura con ruta, costo, estadisticas y logs temporales de ejecucion.
     """
     import heapq
 
@@ -36,14 +35,33 @@ def search(graph, start, goal):
     frontier = []
     heapq.heappush(frontier, (heuristic.get(start, 0), 0, start))
 
+    logs = [
+        "=== Inicio A* ===",
+        f"Nodo inicial: {start}",
+        f"Nodo objetivo: {goal}",
+    ]
+    iteracion = 0
+    nodos_expandidos = 0
+
     while frontier:
+        iteracion += 1
         # Se extrae el nodo con menor f(n)
         f_cost, g_cost, node = heapq.heappop(frontier)
+
+        logs.append(f"\nIteracion {iteracion} - Extraccion")
+        logs.append(f"Nodo actual: {node}")
+        logs.append(f"f(n) actual: {f_cost:.2f}")
+        logs.append(f"g(n) actual: {g_cost:.2f}")
+        logs.append(f"Distancias conocidas: {dist}")
+        logs.append(f"Frontera actual: {frontier}")
 
         # Si este nodo ya tiene un mejor costo registrado, se ignora
         # (esto evita procesar caminos peores, igual que en UCS)
         if g_cost > dist.get(node, float('inf')):
+            logs.append("Entrada obsoleta descartada por costo mayor al mejor conocido.")
             continue
+
+        nodos_expandidos += 1
 
         # Si se llega al objetivo, reconstruye el camino
         if node == goal:
@@ -53,7 +71,23 @@ def search(graph, start, goal):
                 path.append(cur)
                 cur = parent[cur]
             path.reverse()
-            return path, dist[goal]
+
+            logs.append("\n=== Fin A* ===")
+            logs.append(f"Camino encontrado: {' -> '.join(path)}")
+            logs.append(f"Nodos expandidos: {nodos_expandidos}")
+            logs.append(f"Nodos descubiertos: {len(dist)}")
+            logs.append(f"Costo final de la ruta: {dist[goal]:.2f} km")
+
+            return {
+                "path": path,
+                "cost": dist[goal],
+                "stats": {
+                    "nodes_expanded": nodos_expandidos,
+                    "nodes_discovered": len(dist),
+                    "final_cost": dist[goal],
+                },
+                "logs": logs,
+            }
 
         # Recorre los vecinos del nodo actual
         for neighbor, weight in graph.get(node, {}).items():
@@ -75,3 +109,23 @@ def search(graph, start, goal):
 
                 # Agregar el vecino a la frontera para seguir explorando
                 heapq.heappush(frontier, (f_neighbor, new_cost, neighbor))
+
+        siguiente = frontier[0][2] if frontier else "Ninguno"
+        logs.append(f"Siguiente nodo a visitar: {siguiente}")
+
+    logs.append("\n=== Fin A* ===")
+    logs.append("Camino no encontrado.")
+    logs.append(f"Nodos expandidos: {nodos_expandidos}")
+    logs.append(f"Nodos descubiertos: {len(dist)}")
+    logs.append("Costo final de la ruta: N/A")
+
+    return {
+        "path": None,
+        "cost": None,
+        "stats": {
+            "nodes_expanded": nodos_expandidos,
+            "nodes_discovered": len(dist),
+            "final_cost": None,
+        },
+        "logs": logs,
+    }

@@ -19,8 +19,7 @@ def search(graph, start, goal):
         goal (str): Nodo objetivo.
 
     Retorna:
-        tuple[list[str], float] | None: Ruta encontrada y distancia total recorrida,
-        o None si no existe camino.
+        dict: Estructura con ruta, costo, estadisticas y logs temporales de ejecucion.
     """
     # Cola FIFO: garantiza exploración por niveles (BFS)
     cola = deque([start])
@@ -31,9 +30,26 @@ def search(graph, start, goal):
     # Diccionario para reconstruir el camino recorrido
     predecesor = {start: None}
 
+    logs = [
+        "=== Inicio BFS ===",
+        f"Nodo inicial: {start}",
+        f"Nodo objetivo: {goal}",
+    ]
+    iteracion = 0
+    nodos_expandidos = 0
+
     while cola:
+        iteracion += 1
+
         # Extrae el nodo más antiguo (primero en entrar)
         nodo = cola.popleft()
+        nodos_expandidos += 1
+
+        logs.append(f"\nIteracion {iteracion} - Extraccion")
+        logs.append(f"Nodo actual: {nodo}")
+        logs.append(f"Cola actual: {list(cola)}")
+        logs.append(f"Nodos visitados: {sorted(visitados)}")
+        logs.append(f"Predecesores: {predecesor}")
 
         # Si se alcanza el objetivo, se reconstruye el camino
         if nodo == goal:
@@ -50,7 +66,22 @@ def search(graph, start, goal):
                 destino = camino[i + 1]
                 distancia_total += graph[origen][destino]
 
-            return camino, distancia_total
+            logs.append("\n=== Fin BFS ===")
+            logs.append(f"Camino encontrado: {' -> '.join(camino)}")
+            logs.append(f"Nodos expandidos: {nodos_expandidos}")
+            logs.append(f"Nodos descubiertos: {len(visitados)}")
+            logs.append(f"Costo final de la ruta: {distancia_total:.2f} km")
+
+            return {
+                "path": camino,
+                "cost": distancia_total,
+                "stats": {
+                    "nodes_expanded": nodos_expandidos,
+                    "nodes_discovered": len(visitados),
+                    "final_cost": distancia_total,
+                },
+                "logs": logs,
+            }
 
         # Explora los vecinos del nodo actual (sin usar los pesos)
         for vecino in graph[nodo].keys():
@@ -59,5 +90,23 @@ def search(graph, start, goal):
                 predecesor[vecino] = nodo       # guarda de dónde viene
                 cola.append(vecino)            # lo agrega a la cola
 
+        siguiente = cola[0] if cola else "Ninguno"
+        logs.append(f"Siguiente nodo a visitar: {siguiente}")
+
     # Si no se encuentra camino entre inicio y objetivo
-    return None
+    logs.append("\n=== Fin BFS ===")
+    logs.append("Camino no encontrado.")
+    logs.append(f"Nodos expandidos: {nodos_expandidos}")
+    logs.append(f"Nodos descubiertos: {len(visitados)}")
+    logs.append("Costo final de la ruta: N/A")
+
+    return {
+        "path": None,
+        "cost": None,
+        "stats": {
+            "nodes_expanded": nodos_expandidos,
+            "nodes_discovered": len(visitados),
+            "final_cost": None,
+        },
+        "logs": logs,
+    }

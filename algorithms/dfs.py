@@ -17,17 +17,34 @@ def search(graph, start, goal):
         goal (str): Nodo objetivo.
 
     Retorna:
-        tuple[list[str], float] | None: Ruta encontrada y distancia total recorrida,
-        o None si no existe camino.
+        dict: Estructura con ruta, costo, estadisticas y logs temporales de ejecucion.
     """
-    pila = [start]              # pila para DFS
+    pila = [start]               # pila para DFS
     visitados = set()            # conjunto de nodos visitados
-    predecesores = {start: None}  # diccionario de predecesores
-    
+    predecesores = {start: None} # diccionario de predecesores
+
+    logs = [
+        "=== Inicio DFS ===",
+        f"Nodo inicial: {start}",
+        f"Nodo objetivo: {goal}",
+    ]
+    iteracion = 0
+    nodos_expandidos = 0
+
     while pila:
+        iteracion += 1
         nodo = pila.pop()  # se saca el último
+
+        logs.append(f"\nIteracion {iteracion} - Extraccion")
+        logs.append(f"Nodo actual: {nodo}")
+        logs.append(f"Pila actual: {list(pila)}")
+        logs.append(f"Nodos visitados: {sorted(visitados)}")
+        logs.append(f"Predecesores: {predecesores}")
+
         if nodo not in visitados:
             visitados.add(nodo)
+            nodos_expandidos += 1
+
             # Si llegamos al objetivo, reconstruimos el camino
             if nodo == goal:
                 camino = []
@@ -44,11 +61,48 @@ def search(graph, start, goal):
                     destino = camino[i + 1]
                     distancia_total += graph[origen][destino]
 
-                return camino, distancia_total
+                logs.append("\n=== Fin DFS ===")
+                logs.append(f"Camino encontrado: {' -> '.join(camino)}")
+                logs.append(f"Nodos expandidos: {nodos_expandidos}")
+                logs.append(f"Nodos descubiertos: {len(predecesores)}")
+                logs.append(f"Costo final de la ruta: {distancia_total:.2f} km")
+
+                return {
+                    "path": camino,
+                    "cost": distancia_total,
+                    "stats": {
+                        "nodes_expanded": nodos_expandidos,
+                        "nodes_discovered": len(predecesores),
+                        "final_cost": distancia_total,
+                    },
+                    "logs": logs,
+                }
+
             # Agregar vecinos a la pila
-            vecinos = graph[nodo]
-            for vecino in reversed(vecinos):  # invertir orden
+            vecinos = graph.get(nodo, {})
+            for vecino in reversed(list(vecinos.keys())):  # invertir orden
                 if vecino not in predecesores:
                     predecesores[vecino] = nodo
                     pila.append(vecino)
-    return None
+
+            siguiente = pila[-1] if pila else "Ninguno"
+            logs.append(f"Siguiente nodo a visitar: {siguiente}")
+        else:
+            logs.append("Nodo ya visitado, se omite expansion.")
+
+    logs.append("\n=== Fin DFS ===")
+    logs.append("Camino no encontrado.")
+    logs.append(f"Nodos expandidos: {nodos_expandidos}")
+    logs.append(f"Nodos descubiertos: {len(predecesores)}")
+    logs.append("Costo final de la ruta: N/A")
+
+    return {
+        "path": None,
+        "cost": None,
+        "stats": {
+            "nodes_expanded": nodos_expandidos,
+            "nodes_discovered": len(predecesores),
+            "final_cost": None,
+        },
+        "logs": logs,
+    }

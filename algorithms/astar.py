@@ -22,13 +22,13 @@ def search(graph, start, goal):
     """
     import heapq
 
-    # Aquí saco la heurística del grafo (si no existe, toma 0 por defecto)
+    # Saca la heurística del grafo (si no existe, toma 0 por defecto)
     heuristic = graph.get('heuristic', {})
 
-    # Este diccionario guarda el costo acumulado desde el nodo inicial (g(n))
+    # Guardar el costo acumulado desde el nodo inicial (g(n))
     dist = {start: 0}
 
-    # Este lo uso para poder reconstruir el camino al final
+    # Este lo utiliza para poder reconstruir el camino al final
     parent = {start: None}
 
     # La frontera funciona como una cola de prioridad (heap)
@@ -37,15 +37,15 @@ def search(graph, start, goal):
     heapq.heappush(frontier, (heuristic.get(start, 0), 0, start))
 
     while frontier:
-        # Saco el nodo con menor f(n)
+        # Se extrae el nodo con menor f(n)
         f_cost, g_cost, node = heapq.heappop(frontier)
 
-        # Si este nodo ya tiene un mejor costo registrado, lo ignoro
+        # Si este nodo ya tiene un mejor costo registrado, se ignora
         # (esto evita procesar caminos peores, igual que en UCS)
         if g_cost > dist.get(node, float('inf')):
             continue
 
-        # Si llegué al objetivo, reconstruyo el camino
+        # Si se llega al objetivo, reconstruye el camino
         if node == goal:
             path = []
             cur = goal
@@ -55,26 +55,23 @@ def search(graph, start, goal):
             path.reverse()
             return path, dist[goal]
 
-        # Recorro los vecinos del nodo actual
+        # Recorre los vecinos del nodo actual
         for neighbor, weight in graph.get(node, {}).items():
 
-            # Evito que la clave 'heuristic' interfiera como si fuera un nodo
+            # Se ignora la clave 'heuristic' para no tomarla como un nodo
             if neighbor == 'heuristic':
                 continue
 
-            # Calculo el nuevo costo acumulado (g(n))
+            # Calculo del nuevo costo acumulado (g(n))
             new_cost = dist[node] + weight
 
-            # Si encontré un camino mejor hacia ese vecino, actualizo todo
+            # Si se encuentra un camino mejor hacia ese vecino, se actualiza todo
             if new_cost < dist.get(neighbor, float('inf')):
                 dist[neighbor] = new_cost
                 parent[neighbor] = node
 
-                # Aquí aplico la fórmula de A*: f(n) = g(n) + h(n)
+                # fórmula de A*: f(n) = g(n) + h(n)
                 f_neighbor = new_cost + heuristic.get(neighbor, 0)
 
-                # Agrego el vecino a la frontera para seguir explorando
+                # Agregar el vecino a la frontera para seguir explorando
                 heapq.heappush(frontier, (f_neighbor, new_cost, neighbor))
-
-    # Si no se encontró ningún camino
-        # Implementa algoritmo A*

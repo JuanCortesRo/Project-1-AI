@@ -30,7 +30,16 @@ def search(graph, start, goal):
             while nodo is not None:
                 camino.append(nodo)
                 nodo = predecesor[nodo]  # retrocede al nodo anterior
-            return list(reversed(camino))  # invierte para orden correcto
+            camino = list(reversed(camino))  # invierte para orden correcto
+
+            # Calcula la distancia total recorrida sumando los pesos entre nodos consecutivos.
+            distancia_total = 0
+            for i in range(len(camino) - 1):
+                origen = camino[i]
+                destino = camino[i + 1]
+                distancia_total += graph[origen][destino]
+
+            return camino, distancia_total
 
         # Explora los vecinos del nodo actual (sin usar los pesos)
         for vecino in graph[nodo].keys():

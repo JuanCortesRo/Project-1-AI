@@ -6,22 +6,22 @@ const text = document.getElementById("algoText");
 
 const algorithmsData = {
     "BFS": {
-        desc: "Explora nivel por nivel.",
+        desc: "Búsqueda en amplitud",
         icon: "bi-diagram-3",
         class: "algo-bfs"
     },
     "DFS": {
-        desc: "Explora en profundidad.",
+        desc: "Búsqueda en profundidad",
         icon: "bi-arrow-down-up",
         class: "algo-dfs"
     },
     "UCS": {
-        desc: "Minimiza el costo.",
+        desc: "Búsqueda de costo uniforme",
         icon: "bi-currency-dollar",
         class: "algo-ucs"
     },
     "A*": {
-        desc: "Optimiza con heurística.",
+        desc: "Algoritmo con heurística para optimizar búsqueda",
         icon: "bi-stars",
         class: "algo-astar"
     }

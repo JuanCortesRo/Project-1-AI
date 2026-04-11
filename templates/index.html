@@ -21,7 +21,7 @@
             <i class="bi bi-signpost-split title-icon"></i>
             Ruta óptima entre ciudades
         </h1>
-        <!-- <div class="text-center mt-4">
+        <div class="text-center mt-4">
             <div class="algo-label">Algoritmo seleccionado</div>
 
             <div id="selectedAlgoBadge" class="algo-badge text-white mt-2">
@@ -30,9 +30,10 @@
             </div>
         </div>
 
-        <p id="algoDescription" class="text-muted text-center mt-2"></p> -->
+        <p id="algoDescription" class="text-muted text-center mt-2"></p>
 
-        <form method="post" class="row g-3">
+        <form id="searchForm" method="post" class="row g-3">
+            <input type="hidden" name="showHeuristic" id="showHeuristicInput" value="{% if show_heuristic %}1{% else %}0{% endif %}">
             <div class="col-12">
                 <label class="form-label"><i class="bi bi-cpu"></i> Algoritmo</label>
                 <div class="algo-container">
@@ -83,7 +84,7 @@
             <div id="mainBtnGroup" class="text-center">
                 <button id="submitBtn" type="submit" class="btn btn-success px-5 fw-bold">
                     <i class="bi bi-rocket-takeoff"></i>
-                    <span id="btnText">Ejecutar búsqueda</span>
+                    <span id="btnText">Encontrar ruta</span>
                 </button>
                 <button type="button" id="toggleGraphBtn" class="btn btn-outline-secondary ms-2">
                     <i class="bi bi-diagram-3"></i> Ver grafo
@@ -160,8 +161,21 @@
 
     <!-- MAPA -->
     <div class="card shadow p-3">
-        <h5><i class="bi bi-map"></i> Visualización del mapa</h5>
-        {{ map_html|safe }}
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <h5 class="mb-0"><i class="bi bi-map"></i> Visualización del mapa</h5>
+            <button
+                type="button"
+                id="toggleHeuristicBtn"
+                class="btn btn-sm {% if show_heuristic %}btn-warning{% else %}btn-outline-warning{% endif %}"
+                {% if selected_algorithm != "A*" %}disabled title="Disponible solo con A*"{% endif %}
+            >
+                <i class="bi bi-bezier2"></i>
+                {% if show_heuristic %}Ocultar heurística{% else %}Mostrar heurística{% endif %}
+            </button>
+        </div>
+        <div id="mapPanelContainer">
+            {% include "map_panel.html" %}
+        </div>
     </div>
 
 </div>
@@ -170,6 +184,7 @@
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
 <script>
+    (() => {
     const toggleBtn = document.getElementById('toggleGraphBtn');
     const saveBtn = document.getElementById('saveGraphBtn');
     const resetBtn = document.getElementById('resetGraphBtn');
@@ -177,6 +192,12 @@
     const graphEditBtnGroup = document.getElementById('graphEditBtnGroup');
     const graphContainer = document.getElementById('graphInputContainer');
     const graphTextarea = document.getElementById('graphInput');
+    const showHeuristicInput = document.getElementById('showHeuristicInput');
+    const toggleHeuristicBtn = document.getElementById('toggleHeuristicBtn');
+    const searchForm = document.getElementById('searchForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const mapPanelContainer = document.getElementById('mapPanelContainer');
+    const heuristicAlgoOptions = document.querySelectorAll('.algo-option');
     const originalGraph = `{{ original_graph_json|safe }}`;
 
     // Graph editor
@@ -201,6 +222,81 @@
             graphTextarea.value = originalGraph;
         });
     }
+
+    function updateHeuristicButtonState() {
+        if (!toggleHeuristicBtn || !heuristicAlgoOptions.length) return;
+        const selectedAlgo = document.querySelector('.algo-option:checked');
+        const enabled = selectedAlgo && selectedAlgo.value === 'A*';
+        if (!enabled && showHeuristicInput) {
+            showHeuristicInput.value = '0';
+        }
+        toggleHeuristicBtn.disabled = !enabled;
+        toggleHeuristicBtn.title = enabled ? '' : 'Disponible solo con A*';
+        refreshHeuristicButtonLabel();
+    }
+
+    function refreshHeuristicButtonLabel() {
+        if (!toggleHeuristicBtn || !showHeuristicInput) return;
+        const isOn = showHeuristicInput.value === '1';
+        toggleHeuristicBtn.classList.toggle('btn-warning', isOn);
+        toggleHeuristicBtn.classList.toggle('btn-outline-warning', !isOn);
+        toggleHeuristicBtn.innerHTML = `<i class="bi bi-bezier2"></i> ${isOn ? 'Ocultar heurística' : 'Mostrar heurística'}`;
+    }
+
+    updateHeuristicButtonState();
+    refreshHeuristicButtonLabel();
+
+    heuristicAlgoOptions.forEach(option => {
+        option.addEventListener('change', updateHeuristicButtonState);
+    });
+
+    // En búsquedas normales, iniciar sin capa heurística para evitar split automático.
+    if (searchForm && showHeuristicInput) {
+        searchForm.addEventListener('submit', function() {
+            showHeuristicInput.value = '0';
+        });
+    }
+
+    if (submitBtn && showHeuristicInput) {
+        submitBtn.addEventListener('click', function() {
+            showHeuristicInput.value = '0';
+            refreshHeuristicButtonLabel();
+        });
+    }
+
+    // Toggle heurística sin recargar toda la página.
+    if (toggleHeuristicBtn && showHeuristicInput && searchForm && mapPanelContainer) {
+        toggleHeuristicBtn.addEventListener('click', async function() {
+            if (toggleHeuristicBtn.disabled) return;
+
+            showHeuristicInput.value = showHeuristicInput.value === '1' ? '0' : '1';
+            refreshHeuristicButtonLabel();
+            toggleHeuristicBtn.disabled = true;
+
+            try {
+                const formData = new FormData(searchForm);
+                const response = await fetch('/map-panel', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                if (!response.ok) {
+                    throw new Error('No se pudo actualizar el panel de mapas');
+                }
+
+                const html = await response.text();
+                mapPanelContainer.innerHTML = html;
+            } catch (e) {
+                showHeuristicInput.value = showHeuristicInput.value === '1' ? '0' : '1';
+                refreshHeuristicButtonLabel();
+                console.error(e);
+            } finally {
+                updateHeuristicButtonState();
+            }
+        });
+    }
+    })();
 </script>
 
 </body>

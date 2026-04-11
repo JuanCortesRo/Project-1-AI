@@ -1,5 +1,7 @@
 import folium
-import math
+import json
+from branca.element import Element
+from geo import haversine_km, calculate_geographic_midpoint
 
 # GRAFO
 graph = {
@@ -53,19 +55,7 @@ coords = {
     'Pradera' : (3.4215776102533497, -76.24366085079745),
 }
 
-def punto_medio(lat1, lon1, lat2, lon2):
-    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
-    dlon = lon2 - lon1
-    Bx = math.cos(lat2) * math.cos(dlon)
-    By = math.cos(lat2) * math.sin(dlon)
-    lat3 = math.atan2(
-        math.sin(lat1) + math.sin(lat2),
-        math.sqrt((math.cos(lat1) + Bx)**2 + By**2)
-    )
-    lon3 = lon1 + math.atan2(By, math.cos(lat1) + Bx)
-    return math.degrees(lat3), math.degrees(lon3)
-
-def get_map_html(path=None, algorithm="BFS", graph=None):
+def get_map_html(path=None, algorithm="BFS", graph=None, show_heuristic=False, heuristic_goal=None):
     if graph is None:
         from graph import graph as default_graph
         graph = default_graph
@@ -79,20 +69,31 @@ def get_map_html(path=None, algorithm="BFS", graph=None):
     }
 
     route_color = colors.get(algorithm, "#ff0000")
+    edge_opacity = 0.3 if show_heuristic else 0.6
+    show_edge_labels = not show_heuristic
 
     # nodos
     path_set = set(path) if path else set()
+    city_markers = {}
     for ciudad, (lat, lon) in coords.items():
         color = "red" if ciudad in path_set else "blue"
-        folium.Marker(
+        marker = folium.Marker(
             location=[lat, lon],
             popup=ciudad,
             icon=folium.Icon(color=color)
-        ).add_to(mapa)
+        )
+        marker.add_to(mapa)
+        city_markers[ciudad] = marker
 
     dibujadas = set()
     for ciudad, vecinos in graph.items():
+        if ciudad == 'heuristic' or ciudad not in coords:
+            continue
+
         for vecino, distancia in vecinos.items():
+            if vecino == 'heuristic' or vecino not in coords:
+                continue
+
             if (vecino, ciudad) not in dibujadas:
                 lat1, lon1 = coords[ciudad]
                 lat2, lon2 = coords[vecino]
@@ -101,37 +102,189 @@ def get_map_html(path=None, algorithm="BFS", graph=None):
                     locations=[[lat1, lon1], [lat2, lon2]],
                     color="blue",
                     weight=3,
-                    opacity=0.6
+                    opacity=edge_opacity
                 ).add_to(mapa)
 
-                mid_lat, mid_lon = punto_medio(lat1, lon1, lat2, lon2)
+                if show_edge_labels:
+                    mid_lat, mid_lon = calculate_geographic_midpoint(lat1, lon1, lat2, lon2)
 
-                folium.Marker(
-                    location=[mid_lat, mid_lon],
-                    icon=folium.DivIcon(
-                        html=f"""
-                        <div style="
-                            display: inline-block;
-                            background-color: rgba(255,255,255,0.95);
-                            padding: 4px 8px;
-                            border-radius: 12px;
-                            font-size: 11px;
-                            font-weight: 600;
-                            color: #333;
-                            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-                            border: 1px solid rgba(0,0,0,0.2);
-                            white-space: nowrap;
-                            text-align: center;
-                        ">
-                            {distancia} km
-                        </div>
-                        """,
-                        icon_size=(60, 25),     
-                        icon_anchor=(30, 12),
-                    )
-                ).add_to(mapa)
+                    folium.Marker(
+                        location=[mid_lat, mid_lon],
+                        icon=folium.DivIcon(
+                            html=f"""
+                            <div style="
+                                display: inline-block;
+                                background-color: rgba(255,255,255,0.95);
+                                padding: 4px 8px;
+                                border-radius: 12px;
+                                font-size: 11px;
+                                font-weight: 600;
+                                color: #333;
+                                box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+                                border: 1px solid rgba(0,0,0,0.2);
+                                white-space: nowrap;
+                                text-align: center;
+                            ">
+                                {distancia} km
+                            </div>
+                            """,
+                            icon_size=(60, 25),
+                            icon_anchor=(30, 12),
+                        )
+                    ).add_to(mapa)
 
                 dibujadas.add((ciudad, vecino))
+
+    if show_heuristic and algorithm == "A*" and heuristic_goal in coords:
+        goal_lat, goal_lon = coords[heuristic_goal]
+        heuristic_lines = {}
+        heuristic_label_ids = {}
+
+        for idx, (ciudad, (lat, lon)) in enumerate(coords.items()):
+            if ciudad == heuristic_goal:
+                continue
+
+            heur_dist = haversine_km(lat, lon, goal_lat, goal_lon)
+
+            heur_line = folium.PolyLine(
+                locations=[[lat, lon], [goal_lat, goal_lon]],
+                color="#f39c12",
+                weight=2,
+                opacity=0.55,
+                dash_array="6, 8"
+            )
+            heur_line.add_to(mapa)
+            heuristic_lines[ciudad] = heur_line
+
+            mid_lat, mid_lon = calculate_geographic_midpoint(lat, lon, goal_lat, goal_lon)
+            label_id = f"heur-label-{idx}"
+            heuristic_label_ids[ciudad] = label_id
+            folium.Marker(
+                location=[mid_lat, mid_lon],
+                icon=folium.DivIcon(
+                    html=f"""
+                    <div id="{label_id}" style="
+                        display: inline-block;
+                        background-color: rgba(243,156,18,0.55);
+                        padding: 3px 7px;
+                        border-radius: 10px;
+                        font-size: 10px;
+                        font-weight: 700;
+                        color: white;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+                        white-space: nowrap;
+                        text-align: center;
+                        border: 1px solid rgba(255,255,255,0.5);
+                    ">
+                        h: {heur_dist:.1f} km
+                    </div>
+                    """,
+                    icon_size=(70, 22),
+                    icon_anchor=(35, 11),
+                )
+            ).add_to(mapa)
+
+        if heuristic_lines:
+            line_entries = ",\n".join(
+                f"{json.dumps(city)}: {json.dumps(line.get_name())}"
+                for city, line in heuristic_lines.items()
+            )
+            marker_entries = ",\n".join(
+                f"{json.dumps(city)}: {json.dumps(marker.get_name())}"
+                for city, marker in city_markers.items()
+            )
+            label_entries = ",\n".join(
+                f"{json.dumps(city)}: {json.dumps(label_id)}"
+                for city, label_id in heuristic_label_ids.items()
+            )
+
+            highlight_script = f"""
+            <script>
+            (function() {{
+                const heuristicLineVarNames = {{
+                    {line_entries}
+                }};
+
+                const cityMarkerVarNames = {{
+                    {marker_entries}
+                }};
+
+                const heuristicLabelIds = {{
+                    {label_entries}
+                }};
+
+                const defaultStyle = {{
+                    color: '#f39c12',
+                    weight: 2,
+                    opacity: 0.55,
+                    dashArray: '6, 8'
+                }};
+
+                const activeStyle = {{
+                    color: '#f39c12',
+                    weight: 4,
+                    opacity: 1,
+                    dashArray: null
+                }};
+
+                function resetHeuristicLabels() {{
+                    Object.values(heuristicLabelIds).forEach((id) => {{
+                        const el = document.getElementById(id);
+                        if (el) {{
+                            el.style.backgroundColor = 'rgba(243,156,18,0.55)';
+                        }}
+                    }});
+                }}
+
+                function resolveLayers(varMap) {{
+                    const resolved = {{}};
+                    Object.entries(varMap).forEach(([city, varName]) => {{
+                        if (window[varName]) {{
+                            resolved[city] = window[varName];
+                        }}
+                    }});
+                    return resolved;
+                }}
+
+                function initHighlighting() {{
+                    const heuristicLines = resolveLayers(heuristicLineVarNames);
+                    const cityMarkers = resolveLayers(cityMarkerVarNames);
+
+                    if (!Object.keys(heuristicLines).length || !Object.keys(cityMarkers).length) {{
+                        setTimeout(initHighlighting, 120);
+                        return;
+                    }}
+
+                    function resetHeuristicLines() {{
+                        Object.values(heuristicLines).forEach((line) => line.setStyle(defaultStyle));
+                        resetHeuristicLabels();
+                    }}
+
+                    function highlightCity(city) {{
+                        resetHeuristicLines();
+                        const line = heuristicLines[city];
+                        if (line) {{
+                            line.setStyle(activeStyle);
+                            line.bringToFront();
+
+                            const labelId = heuristicLabelIds[city];
+                            const labelEl = labelId ? document.getElementById(labelId) : null;
+                            if (labelEl) {{
+                                labelEl.style.backgroundColor = 'rgba(243,156,18,0.92)';
+                            }}
+                        }}
+                    }}
+
+                    Object.keys(cityMarkers).forEach((city) => {{
+                        cityMarkers[city].on('click', () => highlightCity(city));
+                    }});
+                }}
+
+                initHighlighting();
+            }})();
+            </script>
+            """
+            mapa.get_root().html.add_child(Element(highlight_script))
                 
     if path and len(path) > 1:
         for i in range(len(path) - 1):

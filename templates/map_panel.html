@@ -1,0 +1,14 @@
+{% if split_map %}
+<div class="map-split-wrap">
+    <div class="map-split-pane map-split-left">
+        {{ map_left_html|safe }}
+    </div>
+    <div class="map-split-pane map-split-right">
+        {{ map_right_html|safe }}
+    </div>
+</div>
+{% else %}
+<div class="map-single-wrap">
+    {{ map_left_html|safe }}
+</div>
+{% endif %}

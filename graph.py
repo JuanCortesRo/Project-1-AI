@@ -4,7 +4,7 @@ import math
 # GRAFO
 graph = {
     'Cali': {'Palmira': 28.5, 'Rozo': 27, 'Dagua' : 48, 'Yumbo' : 18.3, 'Jamundí' : 23.4, 'Candelaria' : 26.3, 'Puerto Tejada' : 35.8},
-    'Palmira': {'Cali': 28.5, 'El Cerrito':20.5, 'Rozo' : 16.6, 'Candelaria' : 16},
+    'Palmira': {'Cali': 28.5, 'El Cerrito':20.5, 'Rozo' : 16.6, 'Candelaria' : 16, 'Pradera' : 14.5},
     'El Cerrito': {'Palmira': 20.5, 'Rozo' : 13.8, 'Guacarí' : 9.7},
     'Rozo' : {'Cali': 27, 'Palmira' : 16.6, 'El Cerrito' : 13.8, 'Mulaló' : 10.5},
     'Buga' : {'Guacarí' : 18.1, 'Yotoco' : 7.9, 'Tuluá' : 27.8},
@@ -21,9 +21,10 @@ graph = {
     'Jamundí' : {'Cali' : 23.4, 'Puerto Tejada' : 23.5, 'Santander de Quilichao' : 33},
     'Puerto Tejada' : {'Jamundí' : 23.5, 'Santander de Quilichao' : 26.7, 'Candelaria' : 26.5, 'Cali' : 35.8, 'Corinto' : 26.2, 'Florida' : 27.8},
     'Santander de Quilichao' : {'Puerto Tejada' : 26.7, 'Jamundí' : 33, 'Corinto': 36.9},
-    'Candelaria' : {'Puerto Tejada' : 26.5, 'Cali' : 26.3, 'Palmira': 16, 'Florida' : 18},
+    'Candelaria' : {'Puerto Tejada' : 26.5, 'Cali' : 26.3, 'Palmira': 16, 'Florida' : 18, 'Pradera' : 14.5},
     'Corinto' : {'Florida' : 19, 'Santander de Quilichao' : 36.9, 'Puerto Tejada': 26.2},
-    'Florida' : {'Corinto' : 19, 'Candelaria' : 18, 'Puerto Tejada' : 27.8}
+    'Florida' : {'Corinto' : 19, 'Candelaria' : 18, 'Puerto Tejada' : 27.8, 'Pradera' : 14.5},
+    'Pradera' : {'Palmira' : 18.9, 'Candelaria' : 14.2, 'Florida' : 14.5}
 }
 
 # COORDENADAS
@@ -49,6 +50,7 @@ coords = {
     'Candelaria' : (3.4086555009976185, -76.35004435108867),
     'Corinto' : (3.176145892399019, -76.26204308386959),
     'Florida' : (3.323456370369777, -76.23782689315841),
+    'Pradera' : (3.4215776102533497, -76.24366085079745),
 }
 
 def punto_medio(lat1, lon1, lat2, lon2):

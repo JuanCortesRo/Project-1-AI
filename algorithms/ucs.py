@@ -9,10 +9,16 @@ Proyecto 1 - IA - Universidad del Valle, 2026
 """
 
 def search(graph, start, goal):
-    """
+    """Ejecuta busqueda de costo uniforme (UCS) 
+
+    Parametros:
+        graph (dict): Grafo ponderado representado como diccionario de adyacencia.
+        start (str): Nodo de inicio.
+        goal (str): Nodo objetivo.
+
     Retorna:
-    - camino: lista de nodos (o None)
-    - costo: número (float/int) o None si no aplica
+        tuple[list[str] | None, float | None]: Ruta y costo total acumulado,
+        o (None, None) si no existe camino.
     """
     dist = {start: 0}
     parent = {start: None}

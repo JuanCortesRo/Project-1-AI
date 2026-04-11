@@ -1,3 +1,12 @@
+"""
+app.py
+
+Descripción: Aplicación web Flask para visualizar y comparar algoritmos de búsqueda sobre el grafo del proyecto.
+Autores: JUAN JOSÉ CORTÉS RODRÍGUEZ, CARLOS MANUEL VILLAMIL GRISALES, JUAN DAVID CHARRY MEDINA, LAURA VALENTINA ARBELAEZ LEUDO
+
+Proyecto 1 - IA - Universidad del Valle, 2026
+"""
+
 from flask import Flask, render_template, request
 import importlib
 from graph import graph, coords, get_map_html
@@ -13,7 +22,14 @@ ALGORITHMS = {
 }
 
 def build_heuristic(goal):
-    """Construye h(n) como distancia Haversine desde cada ciudad hasta la meta."""
+    """Construye la heuristica de distancia para A* respecto a una meta.
+
+    Parametros:
+        goal (str): Ciudad objetivo para calcular h(n).
+
+    Retorna:
+        dict: Diccionario ciudad -> distancia Haversine hasta la meta.
+    """
     if goal not in coords:
         return {}
 
@@ -27,6 +43,14 @@ def build_heuristic(goal):
 
 
 def resolve_search_state(req):
+    """Procesa el estado de busqueda a partir de la solicitud HTTP.
+
+    Parametros:
+        req (Request): Objeto request de Flask con formulario y metodo.
+
+    Retorna:
+        dict: Estado completo para renderizar vista y mapa (camino, costo, errores y opciones UI).
+    """
     path = []
     cost = None
     error = None
@@ -107,10 +131,26 @@ def resolve_search_state(req):
 
 @app.route("/health")
 def health():
-    return "OK", 200
+    """Endpoint que se utiliza para realizar solicitudes constantes al programa en despliegue para que no se duerma
+
+    Parametros:
+        Ninguno.
+
+    Retorna:
+        tuple[str, int]: Texto de estado y codigo HTTP 200.
+    """
+    return "todo ok", 200
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    """Renderiza la pagina principal con resultados de busqueda.
+
+    Parametros:
+        Ninguno.
+
+    Retorna:
+        str: HTML renderizado del template principal.
+    """
     state = resolve_search_state(request)
 
     return render_template(
@@ -135,6 +175,14 @@ def index():
 
 @app.route("/map-panel", methods=["POST"])
 def map_panel():
+    """Renderiza el panel de mapas como respuesta parcial.
+
+    Parametros:
+        Ninguno.
+
+    Retorna:
+        str: HTML renderizado del panel de mapa.
+    """
     state = resolve_search_state(request)
     return render_template(
         "map_panel.html",

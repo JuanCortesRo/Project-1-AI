@@ -9,6 +9,17 @@ Proyecto 1 - IA - Universidad del Valle, 2026
 """
 
 def search(graph, start, goal):
+    """Ejecuta busqueda A* 
+
+    Parametros:
+        graph (dict): Grafo ponderado con clave opcional 'heuristic'.
+        start (str): Nodo de inicio.
+        goal (str): Nodo objetivo.
+
+    Retorna:
+        tuple[list[str], float] | None: Ruta encontrada y costo acumulado,
+        o None si no existe camino.
+    """
     import heapq
 
     # Aquí saco la heurística del grafo (si no existe, toma 0 por defecto)

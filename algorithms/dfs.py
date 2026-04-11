@@ -9,6 +9,17 @@ Proyecto 1 - IA - Universidad del Valle, 2026
 """
 
 def search(graph, start, goal):
+    """Ejecuta busqueda en profundidad (DFS)
+
+    Parametros:
+        graph (dict): Grafo ponderado representado como diccionario de adyacencia.
+        start (str): Nodo de inicio.
+        goal (str): Nodo objetivo.
+
+    Retorna:
+        tuple[list[str], float] | None: Ruta encontrada y distancia total recorrida,
+        o None si no existe camino.
+    """
     pila = [start]              # pila para DFS
     visitados = set()            # conjunto de nodos visitados
     predecesores = {start: None}  # diccionario de predecesores

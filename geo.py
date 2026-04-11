@@ -1,8 +1,27 @@
+"""
+geo.py
+
+Descripción: Utilidades geográficas para cálculo de distancias y puntos medios entre coordenadas.
+Autores: JUAN JOSÉ CORTÉS RODRÍGUEZ, CARLOS MANUEL VILLAMIL GRISALES, JUAN DAVID CHARRY MEDINA, LAURA VALENTINA ARBELAEZ LEUDO
+
+Proyecto 1 - IA - Universidad del Valle, 2026
+"""
+
 import math
 
 
 def haversine_km(lat1, lon1, lat2, lon2):
-    """Distancia geodésica aproximada en km entre dos coordenadas."""
+    """Calcula la distancia aproximada entre dos coordenadas
+
+    Parametros:
+        lat1 (float): Latitud del punto de origen.
+        lon1 (float): Longitud del punto de origen.
+        lat2 (float): Latitud del punto de destino.
+        lon2 (float): Longitud del punto de destino.
+
+    Retorna:
+        float: Distancia aproximada en kilometros usando la formula de Haversine.
+    """
     radius_km = 6371
     lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
     dlat = lat2 - lat1
@@ -13,7 +32,17 @@ def haversine_km(lat1, lon1, lat2, lon2):
 
 
 def calculate_geographic_midpoint(lat1, lon1, lat2, lon2):
-    """Calcula el punto medio geográfico aproximado entre dos coordenadas."""
+    """Calcula el punto medio geografico aproximado entre dos coordenadas
+
+    Parametros:
+        lat1 (float): Latitud del punto de origen.
+        lon1 (float): Longitud del punto de origen.
+        lat2 (float): Latitud del punto de destino.
+        lon2 (float): Longitud del punto de destino.
+
+    Retorna:
+        tuple[float, float]: Latitud y longitud del punto medio aproximado.
+    """
     lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
     dlon = lon2 - lon1
     bx = math.cos(lat2) * math.cos(dlon)

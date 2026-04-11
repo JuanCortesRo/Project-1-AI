@@ -11,6 +11,17 @@ Proyecto 1 - IA - Universidad del Valle, 2026
 from collections import deque
 
 def search(graph, start, goal):
+    """Ejecuta busqueda en amplitud (BFS)
+
+    Parametros:
+        graph (dict): Grafo ponderado representado como diccionario de adyacencia.
+        start (str): Nodo de inicio.
+        goal (str): Nodo objetivo.
+
+    Retorna:
+        tuple[list[str], float] | None: Ruta encontrada y distancia total recorrida,
+        o None si no existe camino.
+    """
     # Cola FIFO: garantiza exploración por niveles (BFS)
     cola = deque([start])
     

@@ -1,3 +1,12 @@
+"""
+graph.py
+
+Descripción: Definición del grafo de ciudades, coordenadas y generación del mapa interactivo con Folium.
+Autores: JUAN JOSÉ CORTÉS RODRÍGUEZ, CARLOS MANUEL VILLAMIL GRISALES, JUAN DAVID CHARRY MEDINA, LAURA VALENTINA ARBELAEZ LEUDO
+
+Proyecto 1 - IA - Universidad del Valle, 2026
+"""
+
 import folium
 import json
 from branca.element import Element
@@ -56,6 +65,18 @@ coords = {
 }
 
 def get_map_html(path=None, algorithm="BFS", graph=None, show_heuristic=False, heuristic_goal=None):
+    """Genera el HTML de un mapa Folium con grafo, ruta y heuristica opcional.
+
+    Parametros:
+        path (list[str] | None): Ruta resultante para resaltar sobre el mapa.
+        algorithm (str): Nombre del algoritmo usado para colorear la ruta.
+        graph (dict | None): Grafo a visualizar; si es None se usa el grafo por defecto.
+        show_heuristic (bool): Indica si se muestran lineas/etiquetas heuristicas de A*.
+        heuristic_goal (str | None): Ciudad objetivo para calcular y dibujar heuristica.
+
+    Retorna:
+        str: HTML del mapa.
+    """
     if graph is None:
         from graph import graph as default_graph
         graph = default_graph

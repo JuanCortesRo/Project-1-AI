@@ -39,6 +39,7 @@ def search(graph, start, goal):
         "=== Inicio A* ===",
         f"Nodo inicial: {start}",
         f"Nodo objetivo: {goal}",
+        f"h(n): {heuristic}",
     ]
     iteracion = 0
     nodos_expandidos = 0
@@ -53,7 +54,7 @@ def search(graph, start, goal):
         logs.append(f"f(n) actual: {f_cost:.2f}")
         logs.append(f"g(n) actual: {g_cost:.2f}")
         logs.append(f"Distancias conocidas: {dist}")
-        logs.append(f"Frontera actual: {frontier}")
+        # logs.append(f"Frontera actual: {frontier}")
 
         # Si este nodo ya tiene un mejor costo registrado, se ignora
         # (esto evita procesar caminos peores, igual que en UCS)
@@ -71,7 +72,7 @@ def search(graph, start, goal):
                 path.append(cur)
                 cur = parent[cur]
             path.reverse()
-
+            logs.append(f"Frontera actual: {frontier}")
             logs.append("\n=== Fin A* ===")
             logs.append(f"Camino encontrado: {' -> '.join(path)}")
             logs.append(f"Nodos expandidos: {nodos_expandidos}")
@@ -111,6 +112,7 @@ def search(graph, start, goal):
                 heapq.heappush(frontier, (f_neighbor, new_cost, neighbor))
 
         siguiente = frontier[0][2] if frontier else "Ninguno"
+        logs.append(f"Frontera actual: {frontier}")
         logs.append(f"Siguiente nodo a visitar: {siguiente}")
 
     logs.append("\n=== Fin A* ===")

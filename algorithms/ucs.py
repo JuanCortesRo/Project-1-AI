@@ -40,7 +40,7 @@ def search(graph, start, goal):
         logs.append(f"\nIteracion {iteracion} - Extraccion")
         logs.append(f"Nodo actual: {node}")
         logs.append(f"Costo acumulado actual: {cost:.2f}")
-        logs.append(f"Frontera actual: {frontier}")
+        # logs.append(f"Frontera actual: {frontier}")
         logs.append(f"Distancias conocidas: {dist}")
 
         # ignorar entradas viejas
@@ -84,8 +84,9 @@ def search(graph, start, goal):
                 dist[neighbor] = new_cost
                 parent[neighbor] = node
                 frontier.append((new_cost, neighbor))
-
-        siguiente = frontier[0][1] if frontier else "Ninguno"
+        
+        logs.append(f"Frontera actual: {frontier}")
+        siguiente = min(frontier, key=lambda x: x[0])[1] if frontier else "Ninguno"
         logs.append(f"Siguiente nodo a visitar: {siguiente}")
 
     logs.append("\n=== Fin UCS ===")

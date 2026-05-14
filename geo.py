@@ -26,9 +26,8 @@ def haversine_km(lat1, lon1, lat2, lon2):
     lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
     dlat = lat2 - lat1
     dlon = lon2 - lon1
-    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
-    c = 2 * math.asin(math.sqrt(a))
-    return radius_km * c
+    calc = radius_km * (2 * math.asin(math.sqrt(math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2)))
+    return calc
 
 
 def calculate_geographic_midpoint(lat1, lon1, lat2, lon2):
@@ -53,3 +52,4 @@ def calculate_geographic_midpoint(lat1, lon1, lat2, lon2):
     )
     lon3 = lon1 + math.atan2(by, math.cos(lat1) + bx)
     return math.degrees(lat3), math.degrees(lon3)
+
